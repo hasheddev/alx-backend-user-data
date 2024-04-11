@@ -10,14 +10,11 @@ import mysql.connector
 PII_FIELDS = ("name", "email", "phone", "ssn", "password")
 
 
-def filter_datum(
-        fields: List[str], redaction: str, message: str,
-        separator: str) -> str:
-    """ obfuscates log message(message) using (redaction) separated by
-    separator """
+def filter_datum(fields: List[str], redaction, message, separator) -> str:
+    """ obfuscates log message(message) using (redaction) """
     for field in fields:
-        regex = r'(?<={}).*?(?={})'.format(field + '.', separator)
-        message = re.sub(regex, redaction, message)
+        message = re.sub(r'(?<={}).*?(?={})'.format(field + '.', separator),
+                         redaction, message)
     return message
 
 
