@@ -23,7 +23,11 @@ class SessionDBAuth(session_exp_auth.SessionExpAuth):
             return None
         try:
             session_list = UserSession.search({"session_id": session_id})
+            if session_list == [] or session_list is None:
+                return None
             created_at = session_list[0].get("created_at", None)
+            if created_at is None:
+                return None
             duration = created_at + timedelta(seconds=self.session_duration)
             time_delta = duration - datetime.now()
             if time_delta.days < 0:
@@ -39,6 +43,8 @@ class SessionDBAuth(session_exp_auth.SessionExpAuth):
             return False
         try:
             session_list = UserSession.search({"session_id": session_id})
+            if session_list == [] or session_list is None:
+                return False
             session_list[0].remove()
             return True
         except Exception:
