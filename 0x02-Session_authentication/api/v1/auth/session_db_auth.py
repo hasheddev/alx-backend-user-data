@@ -1,4 +1,3 @@
-
 #!/usr/bin/env python3
 """Session authentication with expiration
 and storage support module for the API.
@@ -7,10 +6,10 @@ from flask import request
 from datetime import datetime, timedelta
 
 from models.user_session import UserSession
-from .session_exp_auth import SessionExpAuth
+from . import session_exp_auth
 
 
-class SessionDBAuth(SessionExpAuth):
+class SessionDBAuth(session_exp_auth.SessionExpAuth):
     """Session authentication class with expiration and storage support.
     """
 
@@ -56,4 +55,3 @@ class SessionDBAuth(SessionExpAuth):
             return False
         sessions[0].remove()
         return True
-
