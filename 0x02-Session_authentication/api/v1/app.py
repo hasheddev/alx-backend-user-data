@@ -10,7 +10,8 @@ import os
 from api.v1.auth.auth import Auth
 from api.v1.auth.basic_auth import BasicAuth
 from api.v1.auth.session_auth import SessionAuth
-
+from api.v1.auth.session_exp_auth import SessionExpAuth
+from api.v1.auth.session_db_auth import SessionDBAuth
 
 app = Flask(__name__)
 app.register_blueprint(app_views)
@@ -23,6 +24,10 @@ elif auth_type == 'auth':
     auth = Auth()
 elif auth_type == 'session_auth':
     auth = SessionAuth()
+elif auth_type == 'session_exp_auth':
+    auth = SessionExpAuth()
+elif auth_type == 'session_db_auth':
+    auth = SessionDBAuth()
 
 
 @app.before_request
@@ -31,15 +36,18 @@ def before_request():
     if auth:
         excluded_paths = [
                 '/api/v1/status/', '/api/v1/unauthorized/',
-                '/api/v1/forbidden/'
+                '/api/v1/forbidden/', '/api/v1/auth_session/login/'
         ]
         if auth.require_auth(request.path, excluded_paths):
-            if auth.authorization_header(request) is None:
+            authorization_header = auth.authorization_header(request)
+            session_cookie = auth.session_cookie(request)
+            if authorization_header is None and session_cookie is None:
                 abort(401)
             user = auth.current_user(request)
+            request.current_user = user
+            print('\nset user for request\n')
             if user is None:
                 abort(403)
-            request.current_user = user
 
 
 @app.errorhandler(403)
